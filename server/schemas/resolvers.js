@@ -39,11 +39,23 @@ Mutation: {
       const token = signToken(user);
       return { token, user };
     },
-    saveBook: async (parent, { bookId }) => {
-
+    saveBook: async (parent, { bookId }, context) => {
+      if (context.user) {
+        const saveBookIds = await Book.findOneAndUpdate(
+          { bookId: bookId }
+        );
+        return saveBookIds;
+      }
+      throw new AuthenticationError('You need to be logged in!');
     },
-    removeBook: async (parent, { bookId }) => {
-
+    removeBook: async (parent, { bookId }, context) => {
+      if(context.user) {
+        const removeBookId = await Book.findOneAndUpdate(
+          { bookId: bookId }
+        );
+        return removeBookId;
+      }
+      throw new AuthenticationError('You need to be logged in!');
     },
   },
 };
