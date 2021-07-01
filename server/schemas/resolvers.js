@@ -40,10 +40,14 @@ Mutation: {
       return { token, user };
     },
     saveBook: async (parent, { bookId }, context) => {
+      console.log('In saveBook')
       if (context.user) {
-        const saveBookIds = await Book.findOneAndUpdate(
-          { bookId: bookId }
-        );
+        const saveBookIds = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { savedBooks: bookId } },
+          { new: true }
+        ).populate('books');
+        
         return saveBookIds;
       }
       throw new AuthenticationError('You need to be logged in!');

@@ -56,16 +56,14 @@ const SearchBooks = () => {
   const handleSaveBook = async (bookId) => {
     // find the book in `searchedBooks` state by the matching id
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
-
     // get token
     const token = Auth.loggedIn() && Auth.getToken();
-
     if (!token) {
       return false;
     }
-
+console.log(bookToSave)
     try {
-      const response = await saveBook(bookToSave, token);
+      const response = 
       await saveBook({ 
         variables: { 
           authors: bookToSave.authors,
@@ -133,8 +131,8 @@ const SearchBooks = () => {
                   <Card.Text>{book.description}</Card.Text>
                   {Auth.loggedIn() && (
                     <Button
-                      disabled={savedBookIds?.some((savedBookId) => savedBookId === book.bookId)}
-                      className='btn-block btn-info'
+                      // disabled={savedBookIds?.some((savedBookId) => savedBookId === book.bookId)}
+                      // className='btn-block btn-info'
                       onClick={() => handleSaveBook(book.bookId)}>
                       {savedBookIds?.some((savedBookId) => savedBookId === book.bookId)
                         ? 'This book has already been saved!'
