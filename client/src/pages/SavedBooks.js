@@ -9,54 +9,32 @@ import { GET_ME } from '../utils/queries';
 import { REMOVE_BOOK } from '../utils/mutations';
 
 const SavedBooks = () => {
-  const deleteBook = useMutation(REMOVE_BOOK);
-  const userData = useQuery(GET_ME);
-    const loggedIn = Auth.loggedIn();
-    const getToken = Auth.getToken();
-    const getProfile = Auth.getProfile();
-
-      try {
-        const token = loggedIn() ? getToken() : null;
-
-        if (!token) {
-          return false;
-        }
-
-        const response = getProfile(token);
-
-        if (!response.ok) {
-          throw new Error('something went wrong!');
-        }
-
-        const user = response.json();
-        userData(user);
-      } catch (err) {
-        console.error(err);
-      };
-
+  const [deleteBook] = useMutation(REMOVE_BOOK);
+  const { loading, data } = useQuery(GET_ME);
+  const userData = data?.me || {};
+  console.log(userData)
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
-    const token = loggedIn() ? getToken() : null;
-
+    const token = Auth.loggedIn() ? Auth.getToken() : null;
+console.log(bookId)
     if (!token) {
       return false;
     }
 
     try {
-      const response = await deleteBook(bookId, token);
+      const { data } = await deleteBook({
+        Variables: {bookId}});
 
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
-
-      const updatedUser = await response.json();
-      userData(updatedUser);
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
       console.error(err);
     }
   };
+
+  if (loading) {
+    return <h1>Loading...</h1>
+  }
 
   return (
     <>
@@ -73,6 +51,7 @@ const SavedBooks = () => {
         </h2>
         <CardColumns>
           {userData.savedBooks.map((book) => {
+            console.log(book)
             return (
               <Card key={book.bookId} border='dark'>
                 {book.image ? <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant='top' /> : null}

@@ -39,12 +39,12 @@ Mutation: {
       const token = signToken(user);
       return { token, user };
     },
-    saveBook: async (parent, { bookId }, context) => {
-      console.log('In saveBook')
+    saveBook: async (parent, args, context) => {
+      console.log('In saveBook', context.user)
       if (context.user) {
         const saveBookIds = await User.findOneAndUpdate(
           { _id: context.user._id },
-          { $addToSet: { savedBooks: bookId } },
+          { $addToSet: { savedBooks: args } },
           { new: true }
         ).populate('books');
         
